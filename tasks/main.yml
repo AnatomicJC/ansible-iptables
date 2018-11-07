@@ -1,0 +1,4 @@
+---
+- import_tasks: iptables.yml
+  when: iptables_enabled
+  tags: iptables_role

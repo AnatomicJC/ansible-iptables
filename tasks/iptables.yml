@@ -1,0 +1,42 @@
+---
+- name: Install iptables-persistent
+  apt:
+    name: "iptables-persistent"
+    state: latest
+
+- name: populate service facts
+  service_facts:
+
+- name: copy iptables rules files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0700
+  with_items:
+    - src: "usr/local/sbin/myIptables"
+      dest: "/usr/local/sbin/myIptables"
+    - src: "usr/local/sbin/myIp6tables"
+      dest: "/usr/local/sbin/myIp6tables"
+
+- name: Apply iptables rules
+  shell: "{{ item }}"
+  with_items:
+    - /usr/local/sbin/myIptables
+    - /usr/local/sbin/myIp6tables
+
+- name: Restart some service if exists
+  service:
+    name: "{{ item }}"
+    state: restarted
+  when: 'item in ansible_facts.services'
+  with_items:
+    - ossec
+    - fail2ban
+
+- name: Save iptables rules
+  shell: "{{ item }}"
+  with_items:
+    - ip6tables-save > /etc/iptables/rules.v6
+    - iptables-save > /etc/iptables/rules.v4
