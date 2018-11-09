@@ -18,7 +18,7 @@ iptables_ip4: |
   iptables -A INPUT -i {{ ansible_default_ipv4['interface'] }} -s 0.0.0.0/0 -d 0.0.0.0/0 -p all -m state --state RELATED,ESTABLISHED -j ACCEPT
   
   iptables -A INPUT -p tcp -i {{ ansible_default_ipv4['interface'] }} --dport {{ iptables_ssh_port }} -j ACCEPT
-iptables_ip6:
+iptables_ip6: |
   #!/bin/sh
   
   ip6tables -t filter -F
