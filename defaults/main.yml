@@ -1,36 +1,21 @@
 ---
 iptables_enabled: False
 iptables_ssh_port: 22
-iptables_ip4: |
-  #!/bin/sh
-  
-  iptables -t filter -F
-  iptables -t filter -X
-  
-  iptables -t filter -P INPUT DROP
-  iptables -t filter -P OUTPUT DROP
-  iptables -t filter -P FORWARD DROP
-  
-  iptables -t filter -A OUTPUT -o lo -s 0.0.0.0/0 -d 0.0.0.0/0 -j ACCEPT
-  iptables -t filter -A INPUT -i lo -s 0.0.0.0/0 -d 0.0.0.0/0 -j ACCEPT
-  
-  iptables -A OUTPUT -o {{ ansible_default_ipv4['interface'] }} -s 0.0.0.0/0 -d 0.0.0.0/0 -p all -m state ! --state INVALID -j ACCEPT
-  iptables -A INPUT -i {{ ansible_default_ipv4['interface'] }} -s 0.0.0.0/0 -d 0.0.0.0/0 -p all -m state --state RELATED,ESTABLISHED -j ACCEPT
-  
-  iptables -A INPUT -p tcp -i {{ ansible_default_ipv4['interface'] }} --dport {{ iptables_ssh_port }} -j ACCEPT
-iptables_ip6: |
-  #!/bin/sh
-  
-  ip6tables -t filter -F
-  ip6tables -t filter -X
-  
-  ip6tables -t filter -P INPUT DROP
-  ip6tables -t filter -P OUTPUT ACCEPT
-  ip6tables -t filter -P FORWARD ACCEPT
-  
-  # Allow loopback communication
-  ip6tables -A INPUT -i lo -j ACCEPT
-  ip6tables -A OUTPUT -o lo -j ACCEPT
-  
-  # Enable stateful inspection
-  ip6tables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables_v4_custom_filter: ""
+iptables_v4_custom_rules: ""
+
+# We manage at least the net exposed interface
+iptables_v4_ifaces:
+  - "{{ ansible_default_ipv4['interface'] }}"
+
+iptables_v4_open_ports:
+  - chain: INPUT
+    iface: "{{ ansible_default_ipv4['interface'] }}"
+    protocol: tcp
+    match: tcp
+    dport: "{{ iptables_ssh_port }}"
+# - chain: INPUT (mandatory)
+#   iface: "{{ ansible_default_ipv4['interface'] }}" (optional, this value is the default)
+#   protocol: tcp (optional, this value is the default)
+#   match: tcp (optional, this value is the default)
+#   dport: "{{ iptables_ssh_port }}" (mandatory)

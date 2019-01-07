@@ -1,0 +1,39 @@
+# https://unrouted.io/2017/08/15/docker-firewall/
+# https://stackoverflow.com/questions/43981224/docker-how-to-set-iface-name-when-creating-a-new-network
+
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+{% if iptables_v4_custom_filter %}
+{{ iptables_v4_custom_filter }}
+{% endif %}
+
+-F INPUT
+-F OUTPUT
+
+# Loopback
+-A INPUT -i lo -j ACCEPT
+-A OUTPUT -o lo -j ACCEPT
+
+# Network cards
+{% for iface in iptables_v4_ifaces %}
+-A INPUT -i {{ iface }} -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A OUTPUT -o {{ iface }} -m state ! --state INVALID -j ACCEPT
+
+{% endfor %}
+# Port opening
+{% for port in iptables_v4_open_ports %}
+-A {{ port['chain'] }} -i {{ port['iface'] | default(ansible_default_ipv4['interface']) }} -p {{ port['protocol'] | default('tcp') }} -m {{ port['match'] | default('tcp') }} --dport {{ port['dport'] }} -j ACCEPT
+{% endfor %}
+
+{% if iptables_v4_custom_rules %}
+{{ iptables_v4_custom_rules }}
+
+{% endif %}
+# Default policies 
+# https://unix.stackexchange.com/questions/144605/etc-sysconfig-iptables-how-to-block-everything-except-for-port-80-and-22
+-P OUTPUT DROP
+-P INPUT DROP
+
+COMMIT

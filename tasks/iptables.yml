@@ -4,39 +4,21 @@
     name: "iptables-persistent"
     state: latest
 
-- name: populate service facts
-  service_facts:
-
 - name: copy iptables rules files
-  copy:
-    content: "{{ item.content }}"
+  template:
+    src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: root
     group: root
     mode: 0700
   with_items:
-    - content: "{{ iptables_ip4 }}"
-      dest: "/usr/local/sbin/myIptables"
-    - content: "{{ iptables_ip6 }}"
-      dest: "/usr/local/sbin/myIp6tables"
+    - src: "etc/iptables/rules.v4"
+      dest: "/etc/iptables/rules.v4"
+    - src: "etc/iptables/rules.v6"
+      dest: "/etc/iptables/rules.v6"
 
 - name: Apply iptables rules
   shell: "{{ item }}"
   with_items:
-    - /usr/local/sbin/myIptables
-    - /usr/local/sbin/myIp6tables
-
-- name: Restart some service if exists
-  service:
-    name: "{{ item }}"
-    state: restarted
-  when: 'item in ansible_facts.services'
-  with_items:
-    - ossec
-    - fail2ban
-
-- name: Save iptables rules
-  shell: "{{ item }}"
-  with_items:
-    - ip6tables-save > /etc/iptables/rules.v6
-    - iptables-save > /etc/iptables/rules.v4
+    - iptables-restore -n /etc/iptables/rules.v4
+    - ip6tables-restore -n /etc/iptables/rules.v6
