@@ -17,8 +17,13 @@
     - src: "etc/iptables/rules.v6"
       dest: "/etc/iptables/rules.v6"
 
-- name: Apply iptables rules
+- name: Apply v4 iptables rules
   shell: "{{ item }}"
   with_items:
     - iptables-restore -n /etc/iptables/rules.v4
+
+- name: Apply v6 iptables rules
+  shell: "{{ item }}"
+  with_items:
     - ip6tables-restore -n /etc/iptables/rules.v6
+  ignore_errors: yes
