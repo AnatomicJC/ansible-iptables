@@ -24,7 +24,7 @@
 {% endfor %}
 # Port opening
 {% for port in iptables_v4_open_ports %}
--A {{ port['chain'] }} -i {{ port['iface'] | default(ansible_default_ipv4['interface']) }} -p {{ port['protocol'] | default('tcp') }} -m {{ port['match'] | default('tcp') }}{{ ' -s ' if port['source'] is defined and port['source'] else '' }}{% if port['source'] is defined %}{% for source in port['source'] %}{{ source }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}{{ ' --match multiport' if port['multiport'] is defined and port['multiport'] else '' }} --dport{{ 's' if port['multiport'] is defined and port['multiport'] else '' }} {{ port['dport'] }} -j ACCEPT
+-A {{ port['chain'] }} -i {{ port['iface'] | default(ansible_default_ipv4['interface']) }} -p {{ port['protocol'] | default('tcp') }} -m {{ port['match'] | default('tcp') }}{{ ' -s ' if port['source'] is defined and port['source'] else '' }}{% if port['source'] is defined %}{% for source in port['source'] %}{{ source }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}{% if ',' in port['dport']|string %} --match multiport{% endif %} --dport{% if ',' in port['dport']|string %}s{% endif %} {{ port['dport'] }} -j ACCEPT
 {% endfor %}
 
 {% if iptables_v4_custom_rules %}
