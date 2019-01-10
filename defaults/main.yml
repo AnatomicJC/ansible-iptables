@@ -14,7 +14,9 @@ iptables_v4_open_ports:
     protocol: tcp
     match: tcp
     dport: "{{ iptables_ssh_port }}"
-    source: ""
+    source: []
+    # - x.x.x.x
+    # - y.y.y.y
     multiport: False
 # - chain: INPUT (mandatory)
 #   iface: "{{ ansible_default_ipv4['interface'] }}" (optional, this value is the default)
