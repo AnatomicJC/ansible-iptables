@@ -6,7 +6,8 @@ iptables_v4_custom_rules: ""
 
 # We manage at least the net exposed interface
 iptables_v4_ifaces:
-  - "{{ ansible_default_ipv4['interface'] }}"
+  - iface: "{{ ansible_default_ipv4['interface'] }}"
+    filtered: "{{ True | default(True) }}"
 
 iptables_v4_open_ports:
   - chain: INPUT

@@ -18,8 +18,8 @@
 
 # Network cards
 {% for iface in iptables_v4_ifaces %}
--A INPUT -i {{ iface }} -m state --state RELATED,ESTABLISHED -j ACCEPT
--A OUTPUT -o {{ iface }} -m state ! --state INVALID -j ACCEPT
+-A INPUT -i {{ iface['iface'] }}{% if iface['filtered'] | default(True) %} -m state --state RELATED,ESTABLISHED{% endif %} -j ACCEPT
+-A OUTPUT -o {{ iface['iface'] }}{% if iface['filtered'] | default(True) %} -m state ! --state INVALID{% endif %} -j ACCEPT
 
 {% endfor %}
 # Port opening
