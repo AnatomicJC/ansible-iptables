@@ -21,9 +21,13 @@
   shell: "{{ item }}"
   with_items:
     - iptables-restore -n /etc/iptables/rules.v4
+  environment:
+    PATH: "${PATH}:/sbin:/usr/sbin"
 
 - name: Apply v6 iptables rules
   shell: "{{ item }}"
   with_items:
     - ip6tables-restore -n /etc/iptables/rules.v6
+  environment:
+    PATH: "${PATH}:/sbin:/usr/sbin"
   ignore_errors: yes
