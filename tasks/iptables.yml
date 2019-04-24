@@ -22,12 +22,12 @@
   with_items:
     - iptables-restore -n /etc/iptables/rules.v4
   environment:
-    PATH: "${PATH}:/sbin:/usr/sbin"
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 - name: Apply v6 iptables rules
   shell: "{{ item }}"
   with_items:
     - ip6tables-restore -n /etc/iptables/rules.v6
   environment:
-    PATH: "${PATH}:/sbin:/usr/sbin"
+    PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   ignore_errors: yes
