@@ -2,9 +2,9 @@
 - name: Install iptables-persistent
   apt:
     name: "iptables-persistent"
-    state: latest
+    state: present
 
-- name: copy iptables rules files
+- name: copy iptables v4 rules files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -14,16 +14,18 @@
   with_items:
     - src: "etc/iptables/rules.v4"
       dest: "/etc/iptables/rules.v4"
+  notify:
+    - Apply v4 iptables rules
+
+- name: copy iptables v6 rules files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0700
+  with_items:
     - src: "etc/iptables/rules.v6"
       dest: "/etc/iptables/rules.v6"
-
-- name: Apply v4 iptables rules
-  shell: "{{ item }}"
-  with_items:
-    - iptables-restore -n /etc/iptables/rules.v4
-
-- name: Apply v6 iptables rules
-  shell: "{{ item }}"
-  with_items:
-    - ip6tables-restore -n /etc/iptables/rules.v6
-  ignore_errors: yes
+  notify:
+    - Apply v6 iptables rules

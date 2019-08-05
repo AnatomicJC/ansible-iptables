@@ -1,2 +1,11 @@
 ---
-# handlers file for ansible-iptables
+- name: Apply v4 iptables rules
+  command: "{{ item }}"
+  with_items:
+    - iptables-restore -n /etc/iptables/rules.v4
+
+- name: Apply v6 iptables rules
+  command: "{{ item }}"
+  with_items:
+    - ip6tables-restore -n /etc/iptables/rules.v6
+  ignore_errors: yes

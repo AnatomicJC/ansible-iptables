@@ -2,3 +2,5 @@
 - import_tasks: iptables.yml
   when: iptables_enabled|bool
   tags: iptables_role
+
+- meta: flush_handlers
